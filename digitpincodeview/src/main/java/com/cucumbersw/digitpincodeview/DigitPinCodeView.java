@@ -170,4 +170,13 @@ public class DigitPinCodeView extends LinearLayout{
     public int[] getPinCodes() {
         return mPinValues;
     }
+
+
+    public void reset() {
+        for (int i = 0; i < NUM_OF_PINS; i ++) {
+            mPinValues[i] = INVALID_PIN;
+            mPinCodes[i].setText("");
+            mPos = 0;
+        }
+    }
 }

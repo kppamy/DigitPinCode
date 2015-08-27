@@ -13,6 +13,7 @@ import com.cucumbersw.digitpincodeview.DigitPinCodeView;
 public class MainActivity extends AppCompatActivity implements DigitPinCodeView.PinCodeCompleteListener, View.OnClickListener {
     private DigitPinCodeView mPinCodeView;
     private Button mBtnConfirm;
+    private Button mBtnReset;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,7 +21,9 @@ public class MainActivity extends AppCompatActivity implements DigitPinCodeView.
         mPinCodeView = (DigitPinCodeView) findViewById(R.id.pincodes);
         mPinCodeView.setPinCodeCompleteListener(this);
         mBtnConfirm = (Button)findViewById(R.id.btn_confirm);
+        mBtnReset = (Button)findViewById(R.id.btn_reset);
         mBtnConfirm.setOnClickListener(this);
+        mBtnReset.setOnClickListener(this);
     }
 
     @Override
@@ -71,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements DigitPinCodeView.
                 PIN += String.valueOf(pinCodes[i]);
             }
             Toast.makeText(this, String.format("PIN code is %s", PIN), Toast.LENGTH_SHORT).show();
+        } else if (v.getId() == R.id.btn_reset) {
+            mPinCodeView.reset();
         }
     }
 }
