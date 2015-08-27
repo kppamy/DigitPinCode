@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorControlHighlight">#03A9F4</color>
+    <color name="colorAccent">#0099DD</color>
+    <color name="border_dark">#44000000</color>
+    <color name="solid_grey">#88FFFFFF</color>
+</resources>
