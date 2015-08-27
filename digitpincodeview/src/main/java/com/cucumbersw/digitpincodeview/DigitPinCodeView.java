@@ -2,6 +2,8 @@ package com.cucumbersw.digitpincodeview;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -9,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 
 /**
  */
@@ -18,6 +21,12 @@ public class DigitPinCodeView extends LinearLayout{
     private TextView[] mPinCodes = new TextView[NUM_OF_PINS];
     private int[] mPinValues = new int[4];
     private int mPos = 0; //current input
+
+    private MyHandler mHandler = new MyHandler();
+    private static final long PIN_TXT_AUTO_HIDE_DELAY = 300;
+    private static final int MSG_HIDE_PIN_TXT = 1;
+
+    private PinCodeCompleteListener mInputListener;
 
     public DigitPinCodeView(Context context) {
         this(context, null);
@@ -116,8 +125,12 @@ public class DigitPinCodeView extends LinearLayout{
                         return false;
                 }
                 mPinValues[mPos] = value;
-//                mPinCodes[mPos].setText(String.format("%d", value));
-                mPinCodes[mPos].setText("●");
+                mPinCodes[mPos].setText(String.format("%d", value));
+                if (mPos > 0) {
+                    // once user input on current position, hider former one immediately
+                    hideTextViewInput(mPinCodes[mPos - 1]);
+                }
+                autoHideTxtForView(mPinCodes[mPos]);
                 // clear high light on current position
                 mPinCodes[mPos].setBackgroundResource(R.drawable.bg_normal_with_border_dark);
                 mPos ++; //move pos forward
@@ -140,7 +153,6 @@ public class DigitPinCodeView extends LinearLayout{
         }
     }
 
-    private PinCodeCompleteListener mInputListener;
     public void setPinCodeCompleteListener(PinCodeCompleteListener l) {
         mInputListener = l;
     }
@@ -151,5 +163,26 @@ public class DigitPinCodeView extends LinearLayout{
 
     public int[] getPinCodes() {
         return mPinValues;
+    }
+
+    private void autoHideTxtForView(TextView tv) {
+        mHandler.removeMessages(MSG_HIDE_PIN_TXT);
+        Message m = mHandler.obtainMessage(MSG_HIDE_PIN_TXT);
+        m.obj = tv;
+        mHandler.sendMessageDelayed(m, PIN_TXT_AUTO_HIDE_DELAY);
+    }
+
+    private static class MyHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == MSG_HIDE_PIN_TXT) {
+                TextView tv = (TextView)msg.obj;
+                hideTextViewInput(tv);
+            }
+        }
+    }
+
+    private static void hideTextViewInput(TextView tv) {
+        tv.setText("●");
     }
 }
