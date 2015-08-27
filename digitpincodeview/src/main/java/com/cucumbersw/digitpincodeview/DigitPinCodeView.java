@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,6 +29,8 @@ public class DigitPinCodeView extends LinearLayout{
     private static final int MSG_HIDE_PIN_TXT = 1;
 
     private PinCodeCompleteListener mInputListener;
+
+    private boolean mKeyboardDisplaying;
 
     public DigitPinCodeView(Context context) {
         this(context, null);
@@ -57,6 +61,15 @@ public class DigitPinCodeView extends LinearLayout{
         } else {
             mPinCodes[mPos].setBackgroundResource(R.drawable.bg_normal_with_border_dark);
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (!mKeyboardDisplaying) {
+            ((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     @Override
