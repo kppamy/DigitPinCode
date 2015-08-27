@@ -2,8 +2,6 @@ package com.cucumbersw.digitpincodeview;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -12,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 
 /**
@@ -20,13 +17,9 @@ import android.widget.TextView;
 public class DigitPinCodeView extends LinearLayout{
     public static final int INVALID_PIN = -1;
     private static final int NUM_OF_PINS = 4;
-    private TextView[] mPinCodes = new TextView[NUM_OF_PINS];
+    private PinCodeTextView[] mPinCodes = new PinCodeTextView[NUM_OF_PINS];
     private int[] mPinValues = new int[4];
     private int mPos = 0; //current input
-
-    private MyHandler mHandler = new MyHandler();
-    private static final long PIN_TXT_AUTO_HIDE_DELAY = 300;
-    private static final int MSG_HIDE_PIN_TXT = 1;
 
     private PinCodeCompleteListener mInputListener;
 
@@ -47,7 +40,7 @@ public class DigitPinCodeView extends LinearLayout{
         setFocusableInTouchMode(true);
         for (int i = 0; i < NUM_OF_PINS; i ++) {
             mPinValues[i] = INVALID_PIN;
-            mPinCodes[i] = (TextView)inflater.inflate(R.layout.digitpin, null, false);
+            mPinCodes[i] = (PinCodeTextView)inflater.inflate(R.layout.digitpin, null, false);
             int l = (int)(mPinCodes[i].getTextSize() * 2);
             this.addView(mPinCodes[i], new ViewGroup.LayoutParams(l, l));
         }
@@ -64,10 +57,11 @@ public class DigitPinCodeView extends LinearLayout{
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
+    public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
         if (!mKeyboardDisplaying) {
             ((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
                     .toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+            mKeyboardDisplaying = true;
         }
         return super.dispatchTouchEvent(ev);
     }
@@ -138,12 +132,11 @@ public class DigitPinCodeView extends LinearLayout{
                         return false;
                 }
                 mPinValues[mPos] = value;
-                mPinCodes[mPos].setText(String.format("%d", value));
+                mPinCodes[mPos].setPin(String.format("%d", value));
                 if (mPos > 0) {
                     // once user input on current position, hider former one immediately
-                    hideTextViewInput(mPinCodes[mPos - 1]);
+                    mPinCodes[mPos - 1].hidePinImmediately();
                 }
-                autoHideTxtForView(mPinCodes[mPos]);
                 // clear high light on current position
                 mPinCodes[mPos].setBackgroundResource(R.drawable.bg_normal_with_border_dark);
                 mPos ++; //move pos forward
@@ -176,26 +169,5 @@ public class DigitPinCodeView extends LinearLayout{
 
     public int[] getPinCodes() {
         return mPinValues;
-    }
-
-    private void autoHideTxtForView(TextView tv) {
-        mHandler.removeMessages(MSG_HIDE_PIN_TXT);
-        Message m = mHandler.obtainMessage(MSG_HIDE_PIN_TXT);
-        m.obj = tv;
-        mHandler.sendMessageDelayed(m, PIN_TXT_AUTO_HIDE_DELAY);
-    }
-
-    private static class MyHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MSG_HIDE_PIN_TXT) {
-                TextView tv = (TextView)msg.obj;
-                hideTextViewInput(tv);
-            }
-        }
-    }
-
-    private static void hideTextViewInput(TextView tv) {
-        tv.setText("●");
     }
 }
