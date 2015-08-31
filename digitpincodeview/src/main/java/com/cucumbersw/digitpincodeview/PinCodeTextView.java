@@ -1,4 +1,4 @@
-package com.cucumbersw.digitpincodeview;
+package com.example.chenay.skipper;
 
 import android.content.Context;
 import android.graphics.Canvas;
