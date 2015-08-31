@@ -1,4 +1,4 @@
-package com.cucumbersw.digitpincodeview;
+package com.example.chenay.skipper;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -22,6 +22,7 @@ public class DigitPinCodeView extends LinearLayout{
     private int mPos = 0; //current input
 
     private PinCodeCompleteListener mInputListener;
+    private PinCodeInputListener mPinCodeInputListener;
 
     private boolean mKeyboardDisplaying;
 
@@ -139,6 +140,7 @@ public class DigitPinCodeView extends LinearLayout{
                 }
                 // clear high light on current position
                 mPinCodes[mPos].setBackgroundResource(R.drawable.bg_normal_with_border_dark);
+                onPinCodeInput();
                 mPos ++; //move pos forward
                 if (mPos > NUM_OF_PINS - 1) { //all pin codes are input
                     mPos = NUM_OF_PINS - 1; //stay at the last position
@@ -159,12 +161,25 @@ public class DigitPinCodeView extends LinearLayout{
         }
     }
 
+    private void onPinCodeInput(){
+        if(mPinCodeInputListener!=null){
+            mPinCodeInputListener.onPinCodeInput(mPinValues,mPos);
+        }
+    }
+
     public void setPinCodeCompleteListener(PinCodeCompleteListener l) {
         mInputListener = l;
+    }
+    public void setPinCodeInputListener(PinCodeInputListener l){
+        mPinCodeInputListener=l;
     }
 
     public interface PinCodeCompleteListener {
         void onInputComplete(int[] pinCodes, int length);
+    }
+
+    public interface PinCodeInputListener{
+        void onPinCodeInput(int[] pinCodes, int pos);
     }
 
     public int[] getPinCodes() {
